@@ -37,36 +37,25 @@ impl WindowHandler {
 }
 
 impl ApplicationHandler<()> for WindowHandler {
-    fn resumed(&mut self, event_loop: &winit::event_loop::ActiveEventLoop) {
-        let _window = event_loop.create_window(
-            winit::window::WindowAttributes::default()
-                .with_title("Oxide Window")
-        ).expect("Failed to create window");
+    fn resumed(&mut self, event_loop: &ActiveEventLoop) {
+        self.window = Some(AppWindow::create(event_loop, &self.title));
     }
 
     fn window_event(
         &mut self,
-        _event_loop: &ActiveEventLoop,
+        event_loop: &ActiveEventLoop,
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        match event {
-            WindowEvent::CloseRequested => {
-                crate::log::info!("Window close requested. Exiting event loop...");
-                // Gracefully exit the event loop
-                _event_loop.exit();
-            }
-            _ => {}
+        if let WindowEvent::CloseRequested = event {
+            crate::log::info!("Window close requested. Exiting event loop...");
+            event_loop.exit();
         }
     }
 }
 
 /// Run a windowed app with the given handler.
 pub fn run_with_handler(mut handler: WindowHandler) -> Result<(), winit::error::EventLoopError> {
-    let event_loop = EventLoop::new().unwrap();
-    let _window = event_loop.create_window(
-        WindowAttributes::default().with_title("Oxide Window")
-    )?;
-
+    let event_loop = EventLoop::new()?;
     event_loop.run_app(&mut handler)
 }
