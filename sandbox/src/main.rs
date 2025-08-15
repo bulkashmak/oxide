@@ -1,19 +1,13 @@
-use oxide::Application;
+use oxide::{Application, AppCreator, run_game};
+
+struct SandboxApp;
+
+impl AppCreator for SandboxApp {
+    fn create_application() -> Application {
+        Application::new()
+    }
+}
 
 fn main() {
-    oxide::log::info!("Sandbox starting...");
-
-    let mut app = Application::new();
-    
-    // Run in a separate thread for demonstration
-    std::thread::spawn(move || {
-        std::thread::sleep(std::time::Duration::from_secs(3));
-        // We'll stop after 3 seconds
-        // In future this will come from events
-        println!("Requesting shutdown...");
-        // We can't stop here yet without shared mutability; 
-        // will handle with proper events later
-    });
-
-    app.run();
+    run_game::<SandboxApp>();
 }

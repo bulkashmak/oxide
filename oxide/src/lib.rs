@@ -13,7 +13,6 @@ impl Application {
 
     pub fn run(&mut self) {
         log::info!("Oxide Application starting main loop...");
-
         while self.running {
             self.update();
         }
@@ -21,7 +20,6 @@ impl Application {
 
     fn update(&self) {
         log::debug!("Application update tick...");
-        // Simulate doing work
         std::thread::sleep(std::time::Duration::from_millis(500));
     }
 
@@ -29,4 +27,15 @@ impl Application {
         log::info!("Stopping Oxide Application...");
         self.running = false;
     }
+}
+
+/// The trait that the sandbox must implement.
+pub trait AppCreator {
+    fn create_application() -> Application;
+}
+
+/// The engine's entry point: runs whatever app the sandbox returns.
+pub fn run_game<T: AppCreator>() {
+    let mut app = T::create_application();
+    app.run();
 }
