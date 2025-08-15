@@ -1,30 +1,14 @@
 use winit::{
     application::ApplicationHandler,
-    event::WindowEvent,
+    dpi::LogicalSize,
+    event::{WindowEvent},
     event_loop::{ActiveEventLoop, EventLoop},
-    window::{Window, WindowAttributes, WindowId},
+    window::{Window, WindowId, WindowAttributes},
 };
 
-/// Simple wrapper over a winit Window + title config.
-pub struct AppWindow {
-    pub window: Window,
-}
-
-impl AppWindow {
-    fn create(event_loop: &ActiveEventLoop, title: &str) -> Self {
-        let attrs = WindowAttributes::default().with_title(title.to_string());
-        let window = event_loop
-            .create_window(attrs)
-            .expect("Failed to create window");
-        crate::log::info!("Window created: \"{}\"", title);
-        Self { window }
-    }
-}
-
-/// The engine's application handler that owns the window during the event loop.
 pub struct WindowHandler {
     title: String,
-    window: Option<AppWindow>,
+    window: Option<Window>,
 }
 
 impl WindowHandler {
@@ -38,23 +22,38 @@ impl WindowHandler {
 
 impl ApplicationHandler<()> for WindowHandler {
     fn resumed(&mut self, event_loop: &ActiveEventLoop) {
-        self.window = Some(AppWindow::create(event_loop, &self.title));
+        let attrs = WindowAttributes::default()
+            .with_title(&self.title)
+            .with_inner_size(LogicalSize::new(800.0, 600.0));
+
+        let window = event_loop.create_window(attrs).expect("Failed to create window");
+
+        // Request at least one redraw so the compositor maps the surface
+        window.request_redraw();
+
+        self.window = Some(window);
     }
 
     fn window_event(
         &mut self,
-        event_loop: &ActiveEventLoop,
+        _event_loop: &ActiveEventLoop,
         _window_id: WindowId,
         event: WindowEvent,
     ) {
-        if let WindowEvent::CloseRequested = event {
-            crate::log::info!("Window close requested. Exiting event loop...");
-            event_loop.exit();
+        match event {
+            WindowEvent::RedrawRequested => {
+                // Normally you’d render here — for now, just trigger mapping
+                log::info!("Redraw requested");
+            }
+            WindowEvent::CloseRequested => {
+                log::info!("Close requested, exiting…");
+                std::process::exit(0);
+            }
+            _ => {}
         }
     }
 }
 
-/// Run a windowed app with the given handler.
 pub fn run_with_handler(mut handler: WindowHandler) -> Result<(), winit::error::EventLoopError> {
     let event_loop = EventLoop::new()?;
     event_loop.run_app(&mut handler)
