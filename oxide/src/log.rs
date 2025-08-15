@@ -1,11 +1,13 @@
 use env_logger::Env;
 
-// Re-export macros from the `log` crate
+// Re-export log macros so you can use `oxide::log::info!` etc.
 pub use log::{debug, error, info, trace, warn};
 
-/// Initialize the logger for Oxide.
+/// Initialize logging once (idempotent if called multiple times).
 pub fn init() {
-    env_logger::Builder::from_env(Env::default().default_filter_or("info"))
+    // Default to INFO if RUST_LOG is not set
+    let _ = env_logger::Builder::from_env(Env::default().default_filter_or("info"))
         .format_timestamp_secs()
-        .init();
+        .try_init();
+    info!("Logger initialized.");
 }

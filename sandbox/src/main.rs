@@ -1,13 +1,8 @@
-use oxide::{Application, AppCreator, run_game};
-
-struct SandboxApp;
-
-impl AppCreator for SandboxApp {
-    fn create_application() -> Application {
-        Application::new()
-    }
-}
+use oxide::{log, Application};
 
 fn main() {
-    run_game::<SandboxApp>();
+    log::init();
+
+    let mut app = Application::new();
+    app.run();
 }
