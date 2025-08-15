@@ -1,18 +1,13 @@
-pub fn start() {
-    println!("Oxide Engine started!");
-}
+pub struct Application;
 
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+impl Application {
+    pub fn new() -> Self {
+        println!("Oxide Application created!");
+        Self
+    }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
+    pub fn run(&self) {
+        println!("Oxide Application running...");
+        // Game loop placeholder
     }
 }

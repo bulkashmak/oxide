@@ -1,6 +1,8 @@
-use oxide::start;
+use oxide::Application;
 
 fn main() {
     println!("Sandbox starting...");
-    start();
+
+    let app = Application::new();
+    app.run();
 }
