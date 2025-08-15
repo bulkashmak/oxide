@@ -1,3 +1,6 @@
+use oxide::start;
+
 fn main() {
-    println!("Hello, world!");
+    println!("Sandbox starting...");
+    start();
 }
